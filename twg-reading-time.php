@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: TWG Reading Time Estimator
- * Description: Displays an estimated reading time before WordPress articles with customizable options.
+ * Description: Displays an estimated reading time before articles with customizable options.
  * Version: 1.0
  * Author: Deepanker Verma
  * Author URI: https://thewpguides.com
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 
 // Function to calculate reading time
 function twg_calculate_reading_time($content) {
-    $word_count = str_word_count(strip_tags($content));
+    $word_count = str_word_count(wp_strip_all_tags($content)); 
     $reading_speed = get_option('twg_reading_speed', 200); // Ensure default value
     $reading_time = ceil($word_count / $reading_speed);
     return $reading_time;
@@ -32,7 +32,7 @@ function twg_display_reading_time($content) {
             return $content; // Skip if post type is excluded
         }
 
-        $word_count = str_word_count(strip_tags($content));
+        $word_count = str_word_count(wp_strip_all_tags($content)); 
         $reading_speed = get_option('twg_reading_speed', 200); // Default 200 WPM
         $total_seconds = ceil(($word_count / $reading_speed) * 60); // Convert to seconds
 
@@ -192,9 +192,10 @@ function twg_custom_text_field() {
 
 // Show seconds checkbox
 function twg_display_seconds_field() {
-    $checked = get_option('twg_display_seconds', 'no') === 'yes' ? 'checked' : '';
-    echo '<input type="checkbox" name="twg_display_seconds" value="yes" ' . $checked . ' /> ' . __('Display seconds', 'twg-reading-time');
+    $is_checked = get_option('twg_display_seconds', 'no') === 'yes';
+    echo '<input type="checkbox" name="twg_display_seconds" value="yes" ' . checked($is_checked, true, false) . ' /> ' . esc_html__('Display seconds', 'twg-reading-time');
 }
+
 
 // Plugin activation hook to set default options
 function twg_activate_plugin() {
@@ -203,4 +204,3 @@ function twg_activate_plugin() {
     }
 }
 register_activation_hook(__FILE__, 'twg_activate_plugin');
-
